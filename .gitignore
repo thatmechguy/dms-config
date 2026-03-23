@@ -1,0 +1,19 @@
+# Backup files
+*.bak
+*-backup-*/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Build files
+*.qsb
+
+# Local config overrides
+local.conf
+user.conf
