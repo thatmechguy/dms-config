@@ -115,8 +115,7 @@ ShellRoot {
     property var monitorConfigs: []
 
     Component.onCompleted: {
-        Quickshell.execDetached(["bash", "-c", "/home/cg/.config/hypr/scripts/list-apps.sh"])
-        appsFileView.reload()
+        reloadApps()
     }
 
     function closeAllPanels() {
@@ -137,31 +136,35 @@ ShellRoot {
 
     property var allApps: []
 
-    FileProxy {
-        id: appsFileView
-        path: "/tmp/quickshell_apps.txt"
-        onContentsChanged: readAllApps()
+    Process {
+        id: appsProc
+        command: ["bash", "-c", "cat /tmp/quickshell_apps.txt 2>/dev/null || echo ''"]
+        running: false
+        stdout: SplitParser { onRead: d => parseAllApps(d) }
     }
 
-    function readAllApps() {
-        try {
-            var content = appsFileView.contents
-            var lines = content.split("\n")
-            allApps = []
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i].trim()
-                if (line && line.includes(",")) {
-                    var parts = line.split(",")
-                    if (parts.length >= 2) {
-                        allApps.push({
-                            name: parts[0].trim(),
-                            exec: parts[1].trim(),
-                            icon: parts.length > 2 ? parts[2].trim() : ""
-                        })
-                    }
+    function parseAllApps(content) {
+        if (!content) return
+        var lines = content.split("\n")
+        allApps = []
+        for (var i = 0; i < lines.length; i++) {
+            var line = lines[i].trim()
+            if (line && line.includes(",")) {
+                var parts = line.split(",")
+                if (parts.length >= 2) {
+                    allApps.push({
+                        name: parts[0].trim(),
+                        exec: parts[1].trim(),
+                        icon: parts.length > 2 ? parts[2].trim() : ""
+                    })
                 }
             }
-        } catch(e) {}
+        }
+    }
+
+    function reloadApps() {
+        Quickshell.execDetached(["bash", "-c", "/home/cg/.config/hypr/scripts/list-apps.sh"])
+        appsProc.running = true
     }
 
     // OSD Timer
