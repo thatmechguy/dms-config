@@ -1,6 +1,17 @@
-# QuickShell Desktop Configuration
+# QuickShell Desktop
 
-A Windows 11-inspired desktop shell for Hyprland with QuickShell.
+A Windows 11-inspired desktop shell for Hyprland with QuickShell. Features include a start menu, action center, power menu, wallpaper selector with matugen theming, and a full settings app.
+
+## Quick Install
+
+```bash
+curl -fsSL https://github.com/thatmechguy/dms-config/install.sh | bash
+```
+
+Or with auto-confirm:
+```bash
+curl -fsSL https://github.com/thatmechguy/dms-config/install.sh | bash -s -- --yes
+```
 
 ## Features
 
@@ -10,49 +21,6 @@ A Windows 11-inspired desktop shell for Hyprland with QuickShell.
 - **Wallpaper Selector** - Pick wallpapers with live preview and matugen-based theming
 - **Settings App** - Full-featured settings panel for display, mouse, keyboard, sound, and more
 - **Dynamic Theming** - Automatic color extraction from wallpapers using matugen
-
-## Installation
-
-### Prerequisites
-
-```bash
-# Install required packages (Arch Linux)
-sudo pacman -S quickshell hyprland swww matugen rofi waybar NetworkManager blueman \
-  brightnessctl playerctl hyprpicker grim slurp wl-clipboard cliphist
-
-# Install optional but recommended
-sudo pacman -S kitty chromium nautilus btop pavucontrol blueman polkit-kde-agent
-```
-
-### Quick Install
-
-```bash
-# Backup existing config (optional)
-mv ~/.config/quickshell ~/.config/quickshell.bak
-mv ~/.config/hypr ~/.config/hypr.bak
-
-# Clone/install this config
-git clone https://github.com/yourusername/dms-config.git ~/.config/dms-config
-cd ~/.config/dms-config
-
-# Run installation script
-./install.sh
-```
-
-### Manual Install
-
-```bash
-# Copy quickshell config
-cp quickshell/*.qml ~/.config/quickshell/
-chmod +x hypr/scripts/*.sh
-
-# Copy hypr config
-cp hypr/*.conf ~/.config/hypr/
-cp -r hypr/scripts/* ~/.config/hypr/scripts/
-
-# Create wallpaper directory
-mkdir -p ~/Pictures/Wallpapers
-```
 
 ## Keybindings
 
@@ -69,48 +37,75 @@ mkdir -p ~/Pictures/Wallpapers
 | `Super+Shift+M` | Pin/Maximize Window |
 | `Super+Escape` | Toggle Power Menu |
 | `Escape` | Close all panels/menus |
-| `Ctrl+Escape` | Toggle Power Menu |
 
-## Configuration
+## Manual Installation
 
-### Themes
+### Prerequisites
 
-The setup uses matugen for dynamic theming. Wallpaper colors are extracted and applied to:
-- GTK applications
-- Qt applications
-- Terminal emulators
-- System colors
+```bash
+# Install required packages (Arch Linux)
+sudo pacman -S quickshell hyprland swww matugen rofi brightnessctl playerctl cliphist hyprpicker grim slurp wl-clipboard
 
-### Scripts
+# Optional (recommended)
+sudo pacman -S kitty chromium nautilus btop pavucontrol blueman polkit-kde-agent networkmanager
+```
 
-| Script | Purpose |
-|--------|---------|
-| `theme.sh` | Wallpaper and theme management |
-| `nightlight.sh` | Blue light filter toggle |
-| `volume.sh` | Volume controls for media keys |
-| `brightness.sh` | Brightness controls for media keys |
-| `clipboard.sh` | Clipboard history manager |
+### Clone and Install
+
+```bash
+# Clone the repository
+git clone https://github.com/thatmechguy/dms-config.git ~/.config/dms-config
+cd ~/.config/dms-config
+
+# Run installer
+./install.sh
+
+# Or manually:
+cp quickshell/*.qml ~/.config/quickshell/
+cp hypr/*.conf ~/.config/hypr/
+cp -r hypr/scripts/* ~/.config/hypr/scripts/
+chmod +x ~/.config/hypr/scripts/*.sh
+mkdir -p ~/Pictures/Wallpapers
+```
+
+### Start QuickShell
+
+```bash
+quickshell -p ~/.config/quickshell/shell.qml
+```
+
+## Theme Management
+
+The setup uses [matugen](https://github.com/InioX/matugen) for dynamic theming. Wallpaper colors are automatically extracted and applied to GTK, Qt, and terminal applications.
 
 ### Theme Script Usage
 
 ```bash
 # Pick wallpaper with rofi
-theme.sh pick
+~/.config/hypr/scripts/theme.sh pick
 
 # Set specific wallpaper
-theme.sh set ~/Pictures/wallpaper.jpg
+~/.config/hypr/scripts/theme.sh set ~/Pictures/wallpaper.jpg
 
 # Toggle light/dark mode
-theme.sh toggle
+~/.config/hypr/scripts/theme.sh toggle
 
 # Apply preset theme
-theme.sh preset nord
-theme.sh preset dracula
-theme.sh preset gruvbox
-
-# Show current theme info
-theme.sh info
+~/.config/hypr/scripts/theme.sh preset nord
+~/.config/hypr/scripts/theme.sh preset dracula
+~/.config/hypr/scripts/theme.sh preset gruvbox
+~/.config/hypr/scripts/theme.sh preset catppuccin
 ```
+
+### Available Presets
+- Nord
+- Catppuccin
+- Gruvbox
+- Dracula
+- Tokyo Night
+- Synthwave
+- Forest
+- Ocean
 
 ## File Structure
 
@@ -118,46 +113,18 @@ theme.sh info
 ~/.config/
 ├── quickshell/
 │   ├── shell.qml          # Main shell configuration
-│   └── settings-app.qml     # Settings application
+│   └── settings-app.qml   # Settings application
 └── hypr/
-    ├── hyprland.conf       # Hyprland configuration
-    ├── hypridle.conf       # Idle management
-    ├── hyprlock.conf       # Lock screen config
-    ├── colors.conf         # Color definitions
+    ├── hyprland.conf      # Hyprland configuration
+    ├── hypridle.conf      # Idle management
+    ├── hyprlock.conf      # Lock screen config
+    ├── colors.conf        # Color definitions
     └── scripts/
-        ├── theme.sh        # Theme management
+        ├── theme.sh       # Theme management
         ├── nightlight.sh   # Night light toggle
         ├── volume.sh       # Volume controls
         ├── brightness.sh   # Brightness controls
         └── clipboard.sh    # Clipboard history
-```
-
-## Troubleshooting
-
-### QuickShell won't start
-```bash
-# Check for errors
-quickshell -p ~/.config/quickshell/shell.qml 2>&1
-
-# Validate QML
-cd ~/.config/quickshell
-qmllint shell.qml settings-app.qml
-```
-
-### Wallpaper not changing
-```bash
-# Check swww is running
-pkill swww
-swww-daemon &
-
-# Check matugen is working
-matugen --version
-```
-
-### Keybindings not working
-```bash
-# Reload Hyprland config
-hyprctl reload
 ```
 
 ## Customization
@@ -183,6 +150,32 @@ ListElement { name: "My Theme"; color: "#HEXCOLOR"; accent: "#HEXCOLOR" }
 Edit `~/.config/hypr/scripts/theme.sh`:
 ```bash
 WALLPAPERS_DIR="$HOME/Your/Wallpaper/Path"
+```
+
+## Troubleshooting
+
+### QuickShell won't start
+```bash
+# Check for errors
+quickshell -p ~/.config/quickshell/shell.qml 2>&1
+
+# Validate QML
+qmllint ~/.config/quickshell/shell.qml
+```
+
+### Wallpaper not changing
+```bash
+# Check swww is running
+pkill swww
+swww-daemon &
+
+# Check matugen
+matugen --version
+```
+
+### Keybindings not working
+```bash
+hyprctl reload
 ```
 
 ## Credits
